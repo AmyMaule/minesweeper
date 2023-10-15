@@ -1,3 +1,7 @@
+@font-face {
+  font-family: "mine-sweeper";
+  src: url(mine-sweeper.ttf);
+}
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -5,6 +9,7 @@
 }
 
 body {
+  font-family: "mine-sweeper";
   background-color: rgb(43, 40, 40);
 }
 
@@ -25,11 +30,11 @@ body {
 }
 
 .game-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
   width: 235px;
   height: 235px;
-  background-color: rgb(78, 78, 78);
+  background-color: #C6C6C6;
   border: 5px solid #FDFCFD;
   border-left-color: #757575;
   border-top-color: #757575;
@@ -42,15 +47,18 @@ body {
   width: 25px;
   height: 25px;
   background-color: #C6C6C6;
+  outline: black;
+  outline-width: 4px;
   border: 3px solid #757575;
   border-left-color: #FDFCFD;
   border-top-color: #FDFCFD;
   cursor: pointer;
-}
-
-.mine {
-  background-color: red;
-  cursor: default;
+  overflow: hidden;
+  outline: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  --webkit-user-select: none;
 }
 
 .flag {
@@ -61,6 +69,61 @@ body {
 }
 
 .safe {
+  outline: 1px solid rgb(161, 156, 148);
+  border: none;
+}
+
+.square-1 {
+  color: #0100FA;
+}
+
+.square-2 {
+  color: #047A03;
+}
+
+.square-3 {
+  color: #FC0100;
+}
+
+.square-4 {
+  color: #01007F;
+}
+
+.square-5 {
+  color: #7D0001;
+}
+
+.square-6 {
+  color: #00807E;
+}
+
+.square-7 {
+  color: black;
+}
+
+.square-8 {
+  color: #7F7F7F;
+}
+
+.mine {
+  background-image: url("mine-clear.png");
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: unset;
   border: unset;
-  box-shadow: 1px 0 0 black, 0 1px 0 black, 1px 1px 0 black, 1px 0 0 black inset, 0 1px 0 black inset;
+  outline: 1px solid rgb(161, 156, 148);
+  cursor: default;
+}
+
+.killer-mine {
+  background-image: url("mine-red.png");
+  border: unset;
+}
+
+.game-over {
+  cursor: default;
+}
+.game-over * {
+  cursor: default;
 }/*# sourceMappingURL=styles.css.map */
