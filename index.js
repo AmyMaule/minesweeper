@@ -22,12 +22,37 @@ squares = setMines(squares);
 
 // Determine which squares are adjacent to the current square based on its location on the board
 const calculateAdjacentSquares = (i) => {
-  // if in top row, dont do 0, 1, 2
-  // if on left edge, dont do 0, 3, 6
-  // if on right edge, dont do 2, 5, 8 
-  // if on bottom, dont do 6, 7, 8
+  // if in top row, dont do 0, 1, 2         i < width
+  // if on left edge, dont do 0, 3, 6       i % width === 0
+  // if on right edge, dont do 2, 5, 8      i % width === width - 1
+  // if on bottom, dont do 6, 7, 8          i > (width * height) - width - 1
 
-  return [i - width - 1, i - width, i - width + 1, i - 1, i + 1, i + width - 1, i + width, i + width + 1];
+  const topRow = i < width;
+  const leftEdge = i % width === 0;
+  const rightEdge =  i % width === width - 1;
+  const bottomRow = i > (width * height) - width - 1;
+
+  const adjacentSquares = [];
+  if (topRow && !leftEdge && !rightEdge) {
+    adjacentSquares.push(...[i - 1, i + 1, i + width - 1, i + width, i + width + 1]);
+  } else if (bottomRow && !leftEdge && !rightEdge) {
+    adjacentSquares.push(...[i - width - 1, i - width, i - width + 1, i - 1, i + 1]);
+  } else if (leftEdge && !topRow && !bottomRow) {
+    adjacentSquares.push(...[i - width, i - width + 1, i + 1, i + width, i + width + 1]);
+  } else if (rightEdge && !topRow && !bottomRow) {
+    adjacentSquares.push(...[i - width - 1, i - width, i - 1, i + width - 1, i + width, i + width + 1]);
+  } else if (topRow && leftEdge) {
+    adjacentSquares.push(...[i + 1, i + width, i + width + 1]);
+  } else if (topRow && rightEdge) {
+    adjacentSquares.push(...[i - 1, i + width - 1, i + width]);
+  } else if (bottomRow && leftEdge) {
+    adjacentSquares.push(...[i - width, i - width + 1, i + 1]);
+  } else if (bottomRow && rightEdge) {
+    adjacentSquares.push(...[i - width - 1, i - width, i - 1]);
+  } else {
+    adjacentSquares.push(...[i - width - 1, i - width, i - width + 1, i - 1, i + 1, i + width - 1, i + width, i + width + 1]);
+  }
+  return adjacentSquares;
 }
 
 const calculateAdjacentMines = squares => {
@@ -43,6 +68,7 @@ const calculateAdjacentMines = squares => {
         adjacentMines++;
       }
     });
+    // console.log(adjacentMines)
     return adjacentMines || null;
   });
 }
