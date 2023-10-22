@@ -33,8 +33,6 @@ body {
 .game-container {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-
-
   width: 235px;
   height: 235px;
   // This bg color must stay or 'border' artifacts are produced
