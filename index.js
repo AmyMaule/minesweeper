@@ -22,6 +22,12 @@ const boardSizes = {
 const boardSize = "small";
 const width = boardSizes[boardSize].width;
 const height = boardSizes[boardSize].height;
+
+// Adjust board styles based on the size of the grid
+boardDOM.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+boardDOM.style.width = 25 * width + 25 + "px";
+boardDOM.style.height = 25 * height + 25 + "px";
+
 const totalMines = boardSizes[boardSize].mines;
 let squares = new Array(width * height).fill(null);
 
@@ -91,7 +97,6 @@ const calculateAdjacentMines = squares => {
         adjacentMines++;
       }
     });
-    // console.log(adjacentMines)
     return adjacentMines || null;
   });
 }
@@ -144,13 +149,7 @@ const handleClick = e => {
       return;
     } else if (clickedSquareType === "mine") {
       targetSquare.classList.add("killer-mine");
-      squares.forEach((square, i) => {
-        if (square === "mine") {
-          boardSquares[i].classList.add("mine");
-        }
-      });
-      boardDOM.classList.add("game-over");
-      boardDOM.removeEventListener("mousedown", handleClick);
+      gameOver(boardSquares, "mine");
 
       // REMOVE AFTER TESTING
       boardSquares.forEach((square, i) => {
@@ -164,15 +163,39 @@ const handleClick = e => {
       const currentSquare = Number(targetSquare.id);
       boardSquares[currentSquare].classList.add("safe", `square-${clickedSquareType}`);
       boardSquares[currentSquare].innerText = clickedSquareType;
+      if (checkWin(boardSquares)) {
+        gameOver(boardSquares, "flag");
+      };
     } else {
       // If square is blank, check surrounding squares around to see which others can be opened up
       revealBlankSquares(targetSquare.id);
+      if (checkWin(boardSquares)) {
+        gameOver(boardSquares, "flag");
+      };
     }
 
   // right click
   } else if (e.button == 2) {
     targetSquare.classList.toggle("flag");
   }
+}
+
+const checkWin = boardSquares => {
+  // If a square only has the className "square", it hasn't been clicked yet
+  const unclickedSquares = boardSquares.filter(square => square.className === "square");
+  return unclickedSquares.length === totalMines;
+}
+
+const gameOver = (boardSquares, className) => {
+  boardDOM.classList.add("game-over");
+  boardDOM.removeEventListener("mousedown", handleClick);
+
+  // If the player has won, all mines turn to flags, if they have lost, the mines are revealed
+  squares.forEach((square, i) => {
+    if (square === "mine") {
+      boardSquares[i].classList.add(className);
+    }
+  });
 }
 
 boardDOM.addEventListener("mousedown", handleClick);
