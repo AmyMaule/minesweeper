@@ -1,27 +1,50 @@
 const boardDOM = document.querySelector(".game-container");
 
-// 9x9 grid for small board size
-const width = 9;
-const height = 9;
+const boardSizes = {
+  small: {
+    width: 9,
+    height: 9,
+    mines: 10
+  },
+  medium: {
+    width: 16,
+    height: 16,
+    mines: 40
+  },
+  // should this be 30x16 or 16x30?
+  large: {
+    width: 30,
+    height: 16,
+    mines: 99
+  }
+}
 
+const boardSize = "small";
+const width = boardSizes[boardSize].width;
+const height = boardSizes[boardSize].height;
+const totalMines = boardSizes[boardSize].mines;
 let squares = new Array(width * height).fill(null);
 
 const setMines = squares => {
-  return squares.map(() => {
-    // Not sure if there should be a specific number of mines for each board size - might need to adjust this
-    const mineProbability = 0.15;
-    const isMine = Math.random() < mineProbability;
-    return isMine ? "mine" : null;
-  });
+  let mineLocations = [];
+  while (mineLocations.length !== totalMines) {
+    const newMineLocation  = Math.floor(Math.random() * squares.length);
+    if (!mineLocations.includes(newMineLocation)) {
+      mineLocations.push(newMineLocation);
+      squares[newMineLocation] = "mine";
+    }
+  }
+
+  return squares;
 }
 squares = setMines(squares);
 
-// i - width - 1   i - width   i - width + 1
-// i - 1              i            i + 1
-// i + width - 1   i + width   i + width + 1
-
 // Determine which squares are adjacent to the current square based on its location on the board
 const calculateAdjacentSquares = (i) => {
+  // i - width - 1   i - width   i - width + 1
+  // i - 1              i            i + 1
+  // i + width - 1   i + width   i + width + 1
+
   // if in top row, dont do 0, 1, 2         i < width
   // if on left edge, dont do 0, 3, 6       i % width === 0
   // if on right edge, dont do 2, 5, 8      i % width === width - 1
@@ -40,7 +63,7 @@ const calculateAdjacentSquares = (i) => {
   } else if (leftEdge && !topRow && !bottomRow) {
     adjacentSquares.push(...[i - width, i - width + 1, i + 1, i + width, i + width + 1]);
   } else if (rightEdge && !topRow && !bottomRow) {
-    adjacentSquares.push(...[i - width - 1, i - width, i - 1, i + width - 1, i + width, i + width + 1]);
+    adjacentSquares.push(...[i - width - 1, i - width, i - 1, i + width - 1, i + width]);
   } else if (topRow && leftEdge) {
     adjacentSquares.push(...[i + 1, i + width, i + width + 1]);
   } else if (topRow && rightEdge) {
@@ -89,6 +112,24 @@ const createBoardSquares = (squares) => {
 }
 createBoardSquares(squares);
 
+// Recursively check adjacent squares and mark blank squares as safe
+const revealBlankSquares = id => {
+  const boardSquares = [...boardDOM.childNodes];  
+  const clickedSquareType = squares[id];
+  const adjacentSquares = calculateAdjacentSquares(Number(id));
+
+  if (!clickedSquareType) boardSquares[id].classList.add("safe");
+
+  adjacentSquares.forEach(adjacentSquareID => {
+    if (typeof squares[adjacentSquareID] === "number") {
+      boardSquares[adjacentSquareID].classList.add("safe", `square-${squares[adjacentSquareID]}`);
+      boardSquares[adjacentSquareID].innerText = squares[adjacentSquareID];
+    } else if (!squares[adjacentSquareID] && !boardSquares[adjacentSquareID].classList.contains("safe")) {
+      revealBlankSquares(adjacentSquareID);
+    }
+  });
+}
+
 const handleClick = e => {
   const targetSquare = e.target;
   const clickedSquareType = squares[e.target.id];
@@ -124,7 +165,8 @@ const handleClick = e => {
       boardSquares[currentSquare].classList.add("safe", `square-${clickedSquareType}`);
       boardSquares[currentSquare].innerText = clickedSquareType;
     } else {
-      targetSquare.classList.add("safe");
+      // If square is blank, check surrounding squares around to see which others can be opened up
+      revealBlankSquares(targetSquare.id);
     }
 
   // right click
