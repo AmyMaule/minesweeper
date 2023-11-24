@@ -2,6 +2,10 @@
   font-family: "mine-sweeper";
   src: url(mine-sweeper.ttf);
 }
+@font-face {
+  font-family: "digital-clock";
+  src: url(digital-7.mono.ttf);
+}
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -24,9 +28,33 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   width: 250px;
-  height: 250px;
+  min-height: 250px;
   background-color: #C6C6C6;
+}
+
+.score-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 5rem;
+  background-color: #C6C6C6;
+  border: 5px solid #FDFCFD;
+  border-left-color: #757575;
+  border-top-color: #757575;
+  padding: 0.5rem;
+}
+
+.bomb-counter {
+  font-family: "digital-clock";
+  font-size: 2.7rem;
+  color: red;
+  background-color: black;
+  padding: 0 0.75rem;
+  border: 2px solid #FDFCFD;
+  border-left-color: #757575;
+  border-top-color: #757575;
 }
 
 .game-container {
@@ -62,7 +90,7 @@ body {
 }
 
 .flag {
-  background-image: url("flag.png");
+  background-image: url("images/flag.png");
   background-size: 70%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -106,7 +134,7 @@ body {
 }
 
 .mine {
-  background-image: url("mine-clear.png");
+  background-image: url("images/mine-clear.png");
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -117,7 +145,7 @@ body {
 }
 
 .killer-mine {
-  background-image: url("mine-red.png");
+  background-image: url("images/mine-red.png");
   border: unset;
 }
 

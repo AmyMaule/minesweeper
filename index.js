@@ -1,4 +1,5 @@
 const boardDOM = document.querySelector(".game-container");
+const bombCounterDOM = document.querySelector(".bomb-counter");
 
 const boardSizes = {
   small: {
@@ -22,6 +23,8 @@ const boardSizes = {
 const boardSize = "small";
 const width = boardSizes[boardSize].width;
 const height = boardSizes[boardSize].height;
+let bombCounter = boardSizes[boardSize].mines;
+bombCounterDOM.innerText = bombCounter.toString().padStart(3, 0);
 
 // Adjust board styles based on the size of the grid
 boardDOM.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
@@ -123,13 +126,15 @@ const revealBlankSquares = id => {
   const clickedSquareType = squares[id];
   const adjacentSquares = calculateAdjacentSquares(Number(id));
 
-  if (!clickedSquareType) boardSquares[id].classList.add("safe");
+  if (!clickedSquareType && !boardSquares[id].classList.contains("flag")) {
+    boardSquares[id].classList.add("safe");
+  }
 
   adjacentSquares.forEach(adjacentSquareID => {
-    if (typeof squares[adjacentSquareID] === "number") {
+    if (typeof squares[adjacentSquareID] === "number" && !boardSquares[adjacentSquareID].classList.contains("flag")) {
       boardSquares[adjacentSquareID].classList.add("safe", `square-${squares[adjacentSquareID]}`);
       boardSquares[adjacentSquareID].innerText = squares[adjacentSquareID];
-    } else if (!squares[adjacentSquareID] && !boardSquares[adjacentSquareID].classList.contains("safe")) {
+    } else if (!squares[adjacentSquareID] && !boardSquares[adjacentSquareID].classList.contains("safe") && !boardSquares[adjacentSquareID].classList.contains("flag")) {
       revealBlankSquares(adjacentSquareID);
     }
   });
@@ -176,7 +181,18 @@ const handleClick = e => {
 
   // right click
   } else if (e.button == 2) {
-    targetSquare.classList.toggle("flag");
+    if (!targetSquare.classList.contains("safe")) {
+      targetSquare.classList.contains("flag")
+        ? bombCounter++
+        : bombCounter--;
+        let newBombText = bombCounter.toString();
+        bombCounterDOM.innerText = bombCounter >= 0
+          ? newBombText.padStart(3, 0)
+          : newBombText.length < 3
+            ? newBombText[0] + "0" + newBombText[1]
+            : newBombText;
+      targetSquare.classList.toggle("flag");
+    }
   }
 }
 
