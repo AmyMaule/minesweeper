@@ -39,6 +39,7 @@ body {
 .score-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   min-height: 5rem;
   background-color: #C6C6C6;
@@ -48,15 +49,16 @@ body {
   padding: 0.5rem;
 }
 
-.bomb-counter {
+.digital-counter {
   font-family: "digital-clock";
   font-size: 2.7rem;
   color: red;
   background-color: black;
-  padding: 0 0.75rem;
+  min-width: 5.4rem;
   border: 2px solid #FDFCFD;
   border-left-color: #757575;
   border-top-color: #757575;
+  padding: 0 0.75rem;
 }
 
 .game-container {

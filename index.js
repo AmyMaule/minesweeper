@@ -1,5 +1,6 @@
 const boardDOM = document.querySelector(".game-container");
 const bombCounterDOM = document.querySelector(".bomb-counter");
+const timerDOM = document.querySelector(".timer");
 
 const boardSizes = {
   small: {
@@ -18,6 +19,17 @@ const boardSizes = {
     height: 16,
     mines: 99
   }
+}
+
+let isPlaying = true;
+let timer = 0;
+
+let playInterval;
+if (isPlaying) {
+  playInterval = setInterval(() => {
+    timer++;
+    setNumberInnerText(timerDOM, timer);
+  }, 1000);
 }
 
 const boardSize = "small";
@@ -185,15 +197,20 @@ const handleClick = e => {
       targetSquare.classList.contains("flag")
         ? bombCounter++
         : bombCounter--;
-        let newBombText = bombCounter.toString();
-        bombCounterDOM.innerText = bombCounter >= 0
-          ? newBombText.padStart(3, 0)
-          : newBombText.length < 3
-            ? newBombText[0] + "0" + newBombText[1]
-            : newBombText;
+      setNumberInnerText(bombCounterDOM, bombCounter);
       targetSquare.classList.toggle("flag");
     }
   }
+}
+
+// Ensure minimum of 3 characters for clock and bomb counter
+const setNumberInnerText = (node, value) => {
+  let numberText = value.toString();
+  node.innerText = value >= 0
+  ? numberText.padStart(3, 0)
+  : numberText.length < 3
+    ? numberText[0] + "0" + numberText[1]
+    : numberText;
 }
 
 const checkWin = boardSquares => {
@@ -203,6 +220,8 @@ const checkWin = boardSquares => {
 }
 
 const gameOver = (boardSquares, className) => {
+  isPlaying = false;
+  clearInterval(playInterval)
   boardDOM.classList.add("game-over");
   boardDOM.removeEventListener("mousedown", handleClick);
 
