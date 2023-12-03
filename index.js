@@ -1,6 +1,11 @@
+const boardContainerDOM = document.querySelector(".board-container");
 const boardDOM = document.querySelector(".game-container");
-const bombCounterDOM = document.querySelector(".bomb-counter");
+const flagCounterDOM = document.querySelector(".flag-counter");
 const timerDOM = document.querySelector(".timer");
+const newGameBtn = document.querySelector(".btn-new-game");
+const sizeBtns = [...document.querySelectorAll(".btn-size")];
+let flagCounter, isPlaying, timer, playInterval, width, height, totalMines, squares;
+let boardSize = "small";
 
 const boardSizes = {
   small: {
@@ -21,31 +26,6 @@ const boardSizes = {
   }
 }
 
-let isPlaying = true;
-let timer = 0;
-
-let playInterval;
-if (isPlaying) {
-  playInterval = setInterval(() => {
-    timer++;
-    setNumberInnerText(timerDOM, timer);
-  }, 1000);
-}
-
-const boardSize = "small";
-const width = boardSizes[boardSize].width;
-const height = boardSizes[boardSize].height;
-let bombCounter = boardSizes[boardSize].mines;
-bombCounterDOM.innerText = bombCounter.toString().padStart(3, 0);
-
-// Adjust board styles based on the size of the grid
-boardDOM.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
-boardDOM.style.width = 25 * width + 25 + "px";
-boardDOM.style.height = 25 * height + 25 + "px";
-
-const totalMines = boardSizes[boardSize].mines;
-let squares = new Array(width * height).fill(null);
-
 const setMines = squares => {
   let mineLocations = [];
   while (mineLocations.length !== totalMines) {
@@ -55,10 +35,8 @@ const setMines = squares => {
       squares[newMineLocation] = "mine";
     }
   }
-
   return squares;
 }
-squares = setMines(squares);
 
 // Determine which squares are adjacent to the current square based on its location on the board
 const calculateAdjacentSquares = (i) => {
@@ -115,11 +93,10 @@ const calculateAdjacentMines = squares => {
     return adjacentMines || null;
   });
 }
-squares = calculateAdjacentMines(squares);
 
 const createBoardSquares = (squares) => {
+  boardDOM.innerHTML = "";
   squares.forEach((square, i) => {
-
     let squareDOM = document.createElement("div");
     squareDOM.id = i;
     squareDOM.className = "square";
@@ -130,7 +107,6 @@ const createBoardSquares = (squares) => {
     boardDOM.append(squareDOM);
   });
 }
-createBoardSquares(squares);
 
 // Recursively check adjacent squares and mark blank squares as safe
 const revealBlankSquares = id => {
@@ -153,6 +129,12 @@ const revealBlankSquares = id => {
 }
 
 const handleClick = e => {
+  if (e.target.classList.contains("game-container")) return;
+
+  if (!isPlaying) {
+    isPlaying = true;
+    startPlay();
+  }
   const targetSquare = e.target;
   const clickedSquareType = squares[e.target.id];
   e.preventDefault();
@@ -195,9 +177,9 @@ const handleClick = e => {
   } else if (e.button == 2) {
     if (!targetSquare.classList.contains("safe")) {
       targetSquare.classList.contains("flag")
-        ? bombCounter++
-        : bombCounter--;
-      setNumberInnerText(bombCounterDOM, bombCounter);
+        ? flagCounter++
+        : flagCounter--;
+      setNumberInnerText(flagCounterDOM, flagCounter);
       targetSquare.classList.toggle("flag");
     }
   }
@@ -228,10 +210,72 @@ const gameOver = (boardSquares, className) => {
   // If the player has won, all mines turn to flags, if they have lost, the mines are revealed
   squares.forEach((square, i) => {
     if (square === "mine") {
-      boardSquares[i].classList.add(className);
+      // If a square already contains a flag, it should stay as is
+      if (boardSquares[i].classList.contains("flag")) {
+        return;
+      } else {
+        boardSquares[i].classList.add(className);
+      }
+    } else {
+      // Safe flagged squares were flagged but do not contain mines
+      if (boardSquares[i].classList.contains("flag")) {
+        boardSquares[i].classList.remove("flag");
+        boardSquares[i].classList.add("safe", "safe-flagged");
+      }
     }
   });
 }
 
-boardDOM.addEventListener("mousedown", handleClick);
+const startPlay = () => {
+  clearInterval(playInterval);
+  timerDOM.innerHTML = "000";
+
+  if (isPlaying) {
+    playInterval = setInterval(() => {
+      timer++;
+      setNumberInnerText(timerDOM, timer);
+    }, 1000);
+  }
+}
+
+const setupGame = () => {
+  boardDOM.classList.remove("game-over");
+  clearInterval(playInterval);
+  isPlaying = false;
+  timer = 0;
+  timerDOM.innerHTML = "000";
+
+  // Set board size
+  width = boardSizes[boardSize].width;
+  height = boardSizes[boardSize].height;
+
+  // Adjust board styles based on the size of the grid
+  boardDOM.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+  boardDOM.style.width = 25 * width + 25 + "px";
+  boardDOM.style.height = 25 * height + 25 + "px";
+  boardContainerDOM.style.width = 25 * width + 25 + "px";
+  totalMines = boardSizes[boardSize].mines;
+
+  // Set number of available flags
+  flagCounter = boardSizes[boardSize].mines;
+  flagCounterDOM.innerText = flagCounter.toString().padStart(3, 0);
+
+  // Setup game board with mines and mine-counting squares
+  squares = new Array(width * height).fill(null);
+  squares = setMines(squares);
+  squares = calculateAdjacentMines(squares);
+  createBoardSquares(squares);
+
+  boardDOM.addEventListener("mousedown", handleClick);
+}
+
+const selectGameSize = e => {
+  boardSize = e.target.innerText;
+  setupGame();
+}
+
 boardDOM.addEventListener("contextmenu", e => e.preventDefault());
+newGameBtn.addEventListener("click", setupGame);
+sizeBtns.forEach(btn => btn.addEventListener("click", selectGameSize));
+
+setupGame();
