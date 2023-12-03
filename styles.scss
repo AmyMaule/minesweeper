@@ -36,10 +36,12 @@ body {
   background-color: #C6C6C6;
 }
 
-.score-container {
+.info-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   width: 100%;
   min-height: 5rem;
   background-color: #C6C6C6;
@@ -47,6 +49,73 @@ body {
   border-left-color: #757575;
   border-top-color: #757575;
   padding: 0.5rem;
+}
+
+.btn-new-game {
+  font-family: "mine-sweeper";
+  font-size: 0.8rem;
+  background-color: #C6C6C6;
+  border: 5px solid #757575;
+  border-left-color: #FDFCFD;
+  border-top-color: #FDFCFD;
+  text-align: center;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  transition: 300ms all ease;
+  
+  &:hover {
+    background-color: #dddddd;
+  }
+
+  &:active {
+    background-color: #C6C6C6;
+    border-color: #FDFCFD;
+    border-left-color: #757575;
+    border-top-color: #757575;
+    transition: 300ms all ease;
+  }
+}
+
+.game-size-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 15rem;
+}
+
+.btn-size {
+  font-family: "mine-sweeper";
+  font-size: 0.6rem;
+  background-color: #C6C6C6;
+  border: 3px solid #757575;
+  border-left-color: #FDFCFD;
+  border-top-color: #FDFCFD;
+  text-align: center;
+  cursor: pointer;
+  transition: 300ms all ease;
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #dddddd;
+  }
+
+  &:active {
+    background-color: #C6C6C6;
+    border-color: #FDFCFD;
+    border-left-color: #757575;
+    border-top-color: #757575;
+    transition: 300ms all ease;
+  }
+}
+
+.score-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  // padding: 0.5rem;
 }
 
 .digital-counter {
@@ -150,6 +219,15 @@ body {
 .killer-mine {
   background-image: url("images/mine-red.png");
   border: unset;
+}
+
+.safe-flagged {
+  position: relative;
+  background-image: url("images/safe-flagged.png");
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: unset;
 }
 
 .game-over {
