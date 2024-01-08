@@ -236,3 +236,20 @@ body {
     cursor: default;
   }
 }
+
+// Media queries
+@media screen and (max-width: 790px) {
+  .btn-size:nth-of-type(3) {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .game-size-container {
+    display: none;
+  }
+
+  .btn-size:nth-of-type(2) {
+    display: none;
+  }
+}
