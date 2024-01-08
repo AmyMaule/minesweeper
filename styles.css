@@ -117,6 +117,7 @@ body {
   color: red;
   background-color: black;
   min-width: 5.4rem;
+  min-height: 3rem;
   border: 2px solid #FDFCFD;
   border-left-color: #757575;
   border-top-color: #757575;
