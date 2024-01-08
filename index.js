@@ -18,8 +18,7 @@ const boardSizes = {
     height: 16,
     mines: 40
   },
-  // should this be 30x16 or 16x30?
-  large: {
+ large: {
     width: 30,
     height: 16,
     mines: 99
@@ -44,10 +43,10 @@ const calculateAdjacentSquares = (i) => {
   // i - 1              i            i + 1
   // i + width - 1   i + width   i + width + 1
 
-  // if in top row, dont do 0, 1, 2         i < width
-  // if on left edge, dont do 0, 3, 6       i % width === 0
-  // if on right edge, dont do 2, 5, 8      i % width === width - 1
-  // if on bottom, dont do 6, 7, 8          i > (width * height) - width - 1
+  // if in top row, don't include 0, 1, 2         i < width
+  // if on left edge, don't include 0, 3, 6       i % width === 0
+  // if on right edge, don't include 2, 5, 8      i % width === width - 1
+  // if on bottom, don't include 6, 7, 8          i > (width * height) - width - 1
 
   const topRow = i < width;
   const leftEdge = i % width === 0;
@@ -80,11 +79,8 @@ const calculateAdjacentSquares = (i) => {
 const calculateAdjacentMines = squares => {
   return squares.map((square, i) => {
     if (square === "mine") return "mine";
-
     const adjacentSquares = calculateAdjacentSquares(i);
-    
     let adjacentMines = 0;
-
     adjacentSquares.forEach(adjacentSquare => {
       if (squares[adjacentSquare] === "mine") {
         adjacentMines++;
@@ -94,16 +90,12 @@ const calculateAdjacentMines = squares => {
   });
 }
 
-const createBoardSquares = (squares) => {
+const createBoardSquares = squares => {
   boardDOM.innerHTML = "";
   squares.forEach((square, i) => {
     let squareDOM = document.createElement("div");
     squareDOM.id = i;
     squareDOM.className = "square";
-    
-    if (square === "mine") {
-      squareDOM.innerText = ".";
-    }
     boardDOM.append(squareDOM);
   });
 }
@@ -149,14 +141,6 @@ const handleClick = e => {
     } else if (clickedSquareType === "mine") {
       targetSquare.classList.add("killer-mine");
       gameOver(boardSquares, "mine");
-
-      // REMOVE AFTER TESTING
-      boardSquares.forEach((square, i) => {
-        if (square.classList.contains("mine")) {
-          boardSquares[i].innerText = "";
-        }
-      })
-      // Remove above after testing
 
     } else if (typeof clickedSquareType === "number") {
       const currentSquare = Number(targetSquare.id);
@@ -238,7 +222,8 @@ const startPlay = () => {
   }
 }
 
-const setupGame = () => {
+const setupGame = (e) => {
+  if (e) boardSize = e.target.innerText;
   boardDOM.classList.remove("game-over");
   clearInterval(playInterval);
   isPlaying = false;
@@ -269,13 +254,26 @@ const setupGame = () => {
   boardDOM.addEventListener("mousedown", handleClick);
 }
 
-const selectGameSize = e => {
-  boardSize = e.target.innerText;
-  setupGame();
+// If the user resizes the window with a board size that is too large for the new window, reset the game in a smaller size
+const handleScreenResize = () => {
+  if (window.innerWidth < 790) {
+    if (boardSize === "large") {
+      boardSize = "medium";
+      setupGame();
+    }
+  }
+  if (window.innerWidth < 450) {
+    if (boardSize !== "small") {
+      boardSize = "small";
+      setupGame();
+    }
+  }
 }
 
+// Event listeners
 boardDOM.addEventListener("contextmenu", e => e.preventDefault());
-newGameBtn.addEventListener("click", setupGame);
-sizeBtns.forEach(btn => btn.addEventListener("click", selectGameSize));
+newGameBtn.addEventListener("click", () => setupGame());
+sizeBtns.forEach(btn => btn.addEventListener("click", e => setupGame(e)));
+window.addEventListener("resize", handleScreenResize);
 
 setupGame();
